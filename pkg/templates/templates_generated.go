@@ -3123,7 +3123,7 @@ write_files:
   owner: root
   content: |
     {
-      {{- if HasDataDir . -}}
+      {{- if HasDataDir -}}
       "root": "{{- GetDataDir -}}",
       {{- end -}}
       "live-restore": true,
@@ -3156,7 +3156,7 @@ write_files:
   permissions: "0644"
   owner: root
   content: |
-    {{if HasDataDir .}}
+    {{if HasDataDir}}
     root = "{{GetDataDir}}"
     {{end}}
     subreaper = false
@@ -3314,7 +3314,7 @@ func linuxCloudInitNodecustomdataYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "linux/cloud-init/nodecustomdata.yml", size: 9117, mode: os.FileMode(436), modTime: time.Unix(1591646134, 0)}
+	info := bindataFileInfo{name: "linux/cloud-init/nodecustomdata.yml", size: 9113, mode: os.FileMode(436), modTime: time.Unix(1591659189, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
