@@ -2503,10 +2503,17 @@ func linuxCloudInitArtifactsKrustletFixCaService() (*asset, error) {
 var _linuxCloudInitArtifactsKrustletFixCaSh = []byte(`#!/usr/bin/env bash
 set -o nounset
 set -o pipefail
-set -o errexit
 set -x
 
 DONE="$(grep certificate-authority-data /var/lib/kubelet/bootstrap-kubeconfig)"
+
+if [ -n "$DONE" ]; then
+    echo "Found certificate-authority-data, will not modify bootstrap-kubeconfig"
+    exit 0
+fi
+
+# we don't want to fail if the above grep fails, only after that.
+set -o errexit
 
 # TODO(ace): always use /etc/kubernetes/certs/ca.crt?
 CA_FILE=$(grep certificate-authority /var/lib/kubelet/bootstrap-kubeconfig | cut -d" " -f6)
@@ -2546,6 +2553,7 @@ Environment=KRUSTLET_PRIVATE_KEY_FILE=/etc/kubernetes/certs/kubeletserver.key
 Environment=KRUSTLET_DATA_DIR=/etc/krustlet
 Environment=RUST_LOG=wasi_provider=info,main=info
 Environment=KRUSTLET_BOOTSTRAP_FILE=/var/lib/kubelet/bootstrap-kubeconfig
+ExecStartPre=/bin/bash /opt/azure/containers/krustlet-fix-ca.sh
 ExecStart=/usr/local/bin/krustlet-wasi
 
 [Install]
