@@ -2533,8 +2533,8 @@ var _linuxCloudInitArtifactsKrustletService = []byte(`[Unit]
 Description=Krustlet
 ConditionPathExists=/usr/local/bin/krustlet-wasi
 {{- if IsKrustlet }}
-Requires=bind-mount.service
-After=bind-mount.service
+Requires=krustlet-fix-ca.service
+After=krustlet-fix-ca.service
 {{ end }}
 
 [Service]
