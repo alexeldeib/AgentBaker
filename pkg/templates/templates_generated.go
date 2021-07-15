@@ -2539,21 +2539,20 @@ func linuxCloudInitArtifactsKrustletFixCaSh() (*asset, error) {
 var _linuxCloudInitArtifactsKrustletService = []byte(`[Unit]
 Description=Krustlet
 ConditionPathExists=/usr/local/bin/krustlet-wasi
-{{- if IsKrustlet }}
 Requires=krustlet-fix-ca.service
 After=krustlet-fix-ca.service
-{{ end }}
 
 [Service]
 Restart=on-failure
 RestartSec=5s
+EnvironmentFile=/etc/default/kubelet
 Environment=KUBECONFIG=/var/lib/kubelet/kubeconfig
 Environment=KRUSTLET_CERT_FILE=/etc/kubernetes/certs/kubeletserver.crt
 Environment=KRUSTLET_PRIVATE_KEY_FILE=/etc/kubernetes/certs/kubeletserver.key
 Environment=KRUSTLET_DATA_DIR=/etc/krustlet
 Environment=RUST_LOG=wasi_provider=info,main=info
 Environment=KRUSTLET_BOOTSTRAP_FILE=/var/lib/kubelet/bootstrap-kubeconfig
-Environment=NODE_LABELS={{GetAgentKubernetesLabels . }}
+Environment=NODE_LABELS="${KUBELET_NODE_LABELS}"
 ExecStartPre=/bin/bash /opt/azure/containers/krustlet-fix-ca.sh
 ExecStart=/usr/local/bin/krustlet-wasi
 
