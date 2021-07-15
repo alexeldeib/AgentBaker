@@ -25,6 +25,8 @@
 // linux/cloud-init/artifacts/health-monitor.sh
 // linux/cloud-init/artifacts/init-aks-custom-cloud.sh
 // linux/cloud-init/artifacts/kms.service
+// linux/cloud-init/artifacts/krustlet-fix-ca.service
+// linux/cloud-init/artifacts/krustlet-fix-ca.sh
 // linux/cloud-init/artifacts/krustlet.service
 // linux/cloud-init/artifacts/kubelet-monitor.service
 // linux/cloud-init/artifacts/kubelet-monitor.timer
@@ -2468,8 +2470,68 @@ func linuxCloudInitArtifactsKmsService() (*asset, error) {
 	return a, nil
 }
 
+var _linuxCloudInitArtifactsKrustletFixCaService = []byte(`[Unit]
+Description=Replace certificate-authority file path with content for krustlet TLS bootstrapping
+[Service]
+Restart=on-failure
+RemainAfterExit=yes
+ExecStart=/bin/bash /opt/azure/containers/krustlet-fix-ca.sh
+
+[Install]
+WantedBy=multi-user.target
+`)
+
+func linuxCloudInitArtifactsKrustletFixCaServiceBytes() ([]byte, error) {
+	return _linuxCloudInitArtifactsKrustletFixCaService, nil
+}
+
+func linuxCloudInitArtifactsKrustletFixCaService() (*asset, error) {
+	bytes, err := linuxCloudInitArtifactsKrustletFixCaServiceBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "linux/cloud-init/artifacts/krustlet-fix-ca.service", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _linuxCloudInitArtifactsKrustletFixCaSh = []byte(`#!/usr/bin/env bash
+set -o nounset
+set -o pipefail
+set -o errexit
+set -x
+
+DONE="$(grep certificate-authority-data /var/lib/kubelet/bootstrap-kubeconfig)"
+
+# TODO(ace): always use /etc/kubernetes/certs/ca.crt?
+CA_FILE=$(grep certificate-authority /var/lib/kubelet/bootstrap-kubeconfig | cut -d" " -f6)
+CA_CONTENT="$(cat $CA_FILE | base64 -w 0)"
+sed -i "s~certificate-authority: /etc/kubernetes/certs/ca.crt~certificate-authority-data: $CA_CONTENT~g" /var/lib/kubelet/bootstrap-kubeconfig 
+`)
+
+func linuxCloudInitArtifactsKrustletFixCaShBytes() ([]byte, error) {
+	return _linuxCloudInitArtifactsKrustletFixCaSh, nil
+}
+
+func linuxCloudInitArtifactsKrustletFixCaSh() (*asset, error) {
+	bytes, err := linuxCloudInitArtifactsKrustletFixCaShBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "linux/cloud-init/artifacts/krustlet-fix-ca.sh", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _linuxCloudInitArtifactsKrustletService = []byte(`[Unit]
 Description=Krustlet
+ConditionPathExists=/usr/local/bin/krustlet-wasi
+{{- if IsKrustlet }}
+Requires=bind-mount.service
+After=bind-mount.service
+{{ end }}
 
 [Service]
 Restart=on-failure
@@ -2484,7 +2546,7 @@ ExecStart=/usr/local/bin/krustlet-wasi
 
 [Install]
 WantedBy=multi-user.target
-EOF`)
+`)
 
 func linuxCloudInitArtifactsKrustletServiceBytes() ([]byte, error) {
 	return _linuxCloudInitArtifactsKrustletService, nil
@@ -4146,13 +4208,28 @@ write_files:
     {{GetVariableProperty "cloudInitData" "reconcilePrivateHostsService"}}
 {{- end}}
 
- {{- if IsKrustlet}}
+{{- if IsKrustlet }}
 - path: /etc/systemd/system/krustlet.service
   permissions: "0644"
   encoding: gzip
   owner: root
   content: !!binary |
     {{GetVariableProperty "cloudInitData" "krustletSystemdService"}}
+
+- path: /opt/azure/containers/krustlet-fix-ca.sh
+  permissions: "0544"
+  encoding: gzip
+  owner: root
+  content: !!binary |
+    {{GetVariableProperty "cloudInitData" "krustletFixCaScript"}}
+
+- path: /etc/systemd/system/krustlet-fix-ca.service
+  permissions: "0644"
+  encoding: gzip
+  owner: root
+  content: !!binary |
+    {{GetVariableProperty "cloudInitData" "krustletFixCaSystemdService"}}
+
 {{ else }}
 - path: /etc/systemd/system/kubelet.service
   permissions: "0644"
@@ -7755,6 +7832,8 @@ var _bindata = map[string]func() (*asset, error){
 	"linux/cloud-init/artifacts/health-monitor.sh":                         linuxCloudInitArtifactsHealthMonitorSh,
 	"linux/cloud-init/artifacts/init-aks-custom-cloud.sh":                  linuxCloudInitArtifactsInitAksCustomCloudSh,
 	"linux/cloud-init/artifacts/kms.service":                               linuxCloudInitArtifactsKmsService,
+	"linux/cloud-init/artifacts/krustlet-fix-ca.service":                   linuxCloudInitArtifactsKrustletFixCaService,
+	"linux/cloud-init/artifacts/krustlet-fix-ca.sh":                        linuxCloudInitArtifactsKrustletFixCaSh,
 	"linux/cloud-init/artifacts/krustlet.service":                          linuxCloudInitArtifactsKrustletService,
 	"linux/cloud-init/artifacts/kubelet-monitor.service":                   linuxCloudInitArtifactsKubeletMonitorService,
 	"linux/cloud-init/artifacts/kubelet-monitor.timer":                     linuxCloudInitArtifactsKubeletMonitorTimer,
@@ -7869,6 +7948,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"health-monitor.sh":                         &bintree{linuxCloudInitArtifactsHealthMonitorSh, map[string]*bintree{}},
 				"init-aks-custom-cloud.sh":                  &bintree{linuxCloudInitArtifactsInitAksCustomCloudSh, map[string]*bintree{}},
 				"kms.service":                               &bintree{linuxCloudInitArtifactsKmsService, map[string]*bintree{}},
+				"krustlet-fix-ca.service":                   &bintree{linuxCloudInitArtifactsKrustletFixCaService, map[string]*bintree{}},
+				"krustlet-fix-ca.sh":                        &bintree{linuxCloudInitArtifactsKrustletFixCaSh, map[string]*bintree{}},
 				"krustlet.service":                          &bintree{linuxCloudInitArtifactsKrustletService, map[string]*bintree{}},
 				"kubelet-monitor.service":                   &bintree{linuxCloudInitArtifactsKubeletMonitorService, map[string]*bintree{}},
 				"kubelet-monitor.timer":                     &bintree{linuxCloudInitArtifactsKubeletMonitorTimer, map[string]*bintree{}},

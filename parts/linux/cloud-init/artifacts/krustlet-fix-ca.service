@@ -1,0 +1,9 @@
+[Unit]
+Description=Replace certificate-authority file path with content for krustlet TLS bootstrapping
+[Service]
+Restart=on-failure
+RemainAfterExit=yes
+ExecStart=/bin/bash /opt/azure/containers/krustlet-fix-ca.sh
+
+[Install]
+WantedBy=multi-user.target

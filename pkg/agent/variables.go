@@ -36,6 +36,8 @@ func getCustomDataVariables(config *datamodel.NodeBootstrappingConfiguration) pa
 			"ensureNoDupEbtablesService":     getBase64EncodedGzippedCustomScript(ensureNoDupEbtablesService, config),
 			"bindMountScript":                getBase64EncodedGzippedCustomScript(bindMountScript, config),
 			"bindMountSystemdService":        getBase64EncodedGzippedCustomScript(bindMountSystemdService, config),
+			"krustletFixCaScript":            getBase64EncodedGzippedCustomScript(krustletFixCaScript, config),
+			"krustletFixCaSystemdService":    getBase64EncodedGzippedCustomScript(krustletFixCaSystemdService, config),
 		},
 	}
 

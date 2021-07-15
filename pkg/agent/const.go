@@ -113,6 +113,8 @@ const (
 	reconcilePrivateHostsService              = "linux/cloud-init/artifacts/reconcile-private-hosts.service"
 	bindMountScript                           = "linux/cloud-init/artifacts/bind-mount.sh"
 	bindMountSystemdService                   = "linux/cloud-init/artifacts/bind-mount.service"
+	krustletFixCaScript                       = "linux/cloud-init/artifacts/krustlet-fix-ca.sh"
+	krustletFixCaSystemdService               = "linux/cloud-init/artifacts/krustlet-fix-ca.service"
 
 	// scripts and service for enabling ipv6 dual stack
 	dhcpv6SystemdService       = "linux/cloud-init/artifacts/dhcpv6.service"

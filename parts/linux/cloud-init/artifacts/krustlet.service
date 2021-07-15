@@ -1,5 +1,10 @@
 [Unit]
 Description=Krustlet
+ConditionPathExists=/usr/local/bin/krustlet-wasi
+{{- if IsKrustlet }}
+Requires=bind-mount.service
+After=bind-mount.service
+{{ end }}
 
 [Service]
 Restart=on-failure
@@ -14,4 +19,3 @@ ExecStart=/usr/local/bin/krustlet-wasi
 
 [Install]
 WantedBy=multi-user.target
-EOF

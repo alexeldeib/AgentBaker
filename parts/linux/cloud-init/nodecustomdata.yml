@@ -103,13 +103,28 @@ write_files:
     {{GetVariableProperty "cloudInitData" "reconcilePrivateHostsService"}}
 {{- end}}
 
- {{- if IsKrustlet}}
+{{- if IsKrustlet }}
 - path: /etc/systemd/system/krustlet.service
   permissions: "0644"
   encoding: gzip
   owner: root
   content: !!binary |
     {{GetVariableProperty "cloudInitData" "krustletSystemdService"}}
+
+- path: /opt/azure/containers/krustlet-fix-ca.sh
+  permissions: "0544"
+  encoding: gzip
+  owner: root
+  content: !!binary |
+    {{GetVariableProperty "cloudInitData" "krustletFixCaScript"}}
+
+- path: /etc/systemd/system/krustlet-fix-ca.service
+  permissions: "0644"
+  encoding: gzip
+  owner: root
+  content: !!binary |
+    {{GetVariableProperty "cloudInitData" "krustletFixCaSystemdService"}}
+
 {{ else }}
 - path: /etc/systemd/system/kubelet.service
   permissions: "0644"
