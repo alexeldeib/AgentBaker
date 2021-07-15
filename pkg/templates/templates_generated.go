@@ -831,7 +831,11 @@ ensureKubelet() {
     {{- if ShouldConfigureHTTPProxy}}
     configureEtcEnvironment
     {{- end}}
+    {{- if IsKrustlet}}
+    systemctlEnableAndStart krustlet || exit $ERR_KUBELET_START_FAIL
+    {{- else}}
     systemctlEnableAndStart kubelet || exit $ERR_KUBELET_START_FAIL
+    {{- end}}
     {{if HasAntreaNetworkPolicy}}
     while [ ! -f /etc/cni/net.d/10-antrea.conf ]; do
         sleep 3
