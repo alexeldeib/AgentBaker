@@ -166,6 +166,9 @@ configureSwapFile
 {{- end}}
 
 ensureSysctl
+{{- if IsKrustlet}}
+systemctlEnableAndStart krustlet
+{{- end}}
 ensureKubelet
 ensureJournal
 {{- if NeedsContainerd}} {{- if and IsKubenet (not HasCalicoNetworkPolicy)}}

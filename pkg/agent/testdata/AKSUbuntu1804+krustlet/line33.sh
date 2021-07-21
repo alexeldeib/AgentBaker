@@ -95,6 +95,7 @@ ensureDocker
 ensureMonitorService
 
 ensureSysctl
+systemctlEnableAndStart krustlet
 ensureKubelet
 ensureJournal
 

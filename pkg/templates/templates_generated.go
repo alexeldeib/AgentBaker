@@ -1769,6 +1769,9 @@ configureSwapFile
 {{- end}}
 
 ensureSysctl
+{{- if IsKrustlet}}
+systemctlEnableAndStart krustlet
+{{- end}}
 ensureKubelet
 ensureJournal
 {{- if NeedsContainerd}} {{- if and IsKubenet (not HasCalicoNetworkPolicy)}}
@@ -4251,6 +4254,12 @@ write_files:
   owner: root
   content: !!binary |
     {{GetVariableProperty "cloudInitData" "krustletSystemdService"}}
+- path: /opt/azure/containers/krustlet-fix-ca.sh
+  permissions: "0544"
+  encoding: gzip
+  owner: root
+  content: !!binary |
+    {{GetVariableProperty "cloudInitData" "krustletFixCaScript"}}
 {{ else }}
 - path: /etc/systemd/system/kubelet.service
   permissions: "0644"
