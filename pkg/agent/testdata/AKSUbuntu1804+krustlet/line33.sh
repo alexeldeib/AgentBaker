@@ -73,7 +73,11 @@ if [[ $OS == $UBUNTU_OS_NAME ]] && [ "$FULL_INSTALL_REQUIRED" = "true" ]; then
 else
     echo "Golden image; skipping dependencies installation"
 fi
-downloadKrustlet
+
+
+installContainerRuntime
+
+installNetworkPlugin
 
 installKubeletKubectlAndKubeProxy
 
@@ -86,6 +90,10 @@ configureK8s
 configureCNI
 
 
+ensureDocker
+
+ensureMonitorService
+downloadKrustlet
 
 ensureSysctl
 ensureJournal

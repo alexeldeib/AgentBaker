@@ -88,16 +88,13 @@ else
     echo "Golden image; skipping dependencies installation"
 fi
 
-{{- if IsKrustlet}}
-downloadKrustlet
-{{- else}}
+
 installContainerRuntime
 {{- if and NeedsContainerd TeleportEnabled}}
 installTeleportdPlugin
 {{- end}}
 
 installNetworkPlugin
-{{- end}}
 
 {{- if IsNSeriesSKU}}
 echo $(date),$(hostname), "Start configuring GPU drivers"
@@ -145,7 +142,6 @@ configureCNI
 ensureDHCPv6
 {{- end}}
 
-{{- if not IsKrustlet}}
 {{- if NeedsContainerd}}
 ensureContainerd {{/* containerd should not be configured until cni has been configured first */}}
 {{- else}}
@@ -153,6 +149,9 @@ ensureDocker
 {{- end}}
 
 ensureMonitorService
+
+{{- if IsKrustlet}}
+downloadKrustlet
 {{- end}}
 
 {{- if EnableHostsConfigAgent}}
