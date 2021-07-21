@@ -4488,7 +4488,6 @@ write_files:
 {{end}}
 {{end}}
 
-{{- if not IsKrustlet}}
 {{if NeedsContainerd}}
 {{if UseRuncShimV2}}
 - path: /etc/containerd/config.toml
@@ -4693,7 +4692,7 @@ write_files:
     [Install]
     WantedBy=multi-user.target
     #EOF
-{{end}}
+
 {{- if and IsKubenet (not HasCalicoNetworkPolicy)}}
 - path: /etc/systemd/system/ensure-no-dup.service
   permissions: "0644"

@@ -83,6 +83,7 @@ write_files:
 
 
 
+
 - path: /etc/containerd/config.toml
   permissions: "0644"
   owner: root
@@ -219,7 +220,6 @@ write_files:
     [Install]
     WantedBy=multi-user.target
     #EOF
-
 - path: /etc/systemd/system/ensure-no-dup.service
   permissions: "0644"
   encoding: gzip
