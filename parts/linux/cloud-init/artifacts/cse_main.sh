@@ -88,16 +88,16 @@ else
     echo "Golden image; skipping dependencies installation"
 fi
 
+{{- if IsKrustlet}}
+downloadKrustlet
+{{- else}}
 installContainerRuntime
 {{- if and NeedsContainerd TeleportEnabled}}
 installTeleportdPlugin
 {{- end}}
 
 installNetworkPlugin
-
-{{- if IsKrustlet }}
-    downloadKrustlet
-{{- end }}
+{{- end}}
 
 {{- if IsNSeriesSKU}}
 echo $(date),$(hostname), "Start configuring GPU drivers"
@@ -145,6 +145,7 @@ configureCNI
 ensureDHCPv6
 {{- end}}
 
+{{- if not IsKrustlet}}
 {{- if NeedsContainerd}}
 ensureContainerd {{/* containerd should not be configured until cni has been configured first */}}
 {{- else}}
@@ -152,6 +153,7 @@ ensureDocker
 {{- end}}
 
 ensureMonitorService
+{{- end}}
 
 {{- if EnableHostsConfigAgent}}
 configPrivateClusterHosts
@@ -166,14 +168,15 @@ configureSwapFile
 {{- end}}
 
 ensureSysctl
+ensureJournal
 {{- if IsKrustlet}}
 systemctlEnableAndStart krustlet
-{{- end}}
+{{- else}}
 ensureKubelet
-ensureJournal
 {{- if NeedsContainerd}} {{- if and IsKubenet (not HasCalicoNetworkPolicy)}}
 ensureNoDupOnPromiscuBridge
 {{- end}} {{- end}}
+{{- end}}
 
 if $FULL_INSTALL_REQUIRED; then
     if [[ $OS == $UBUNTU_OS_NAME ]]; then

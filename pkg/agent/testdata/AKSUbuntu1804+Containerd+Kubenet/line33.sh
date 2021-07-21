@@ -76,7 +76,6 @@ if [[ $OS == $UBUNTU_OS_NAME ]] && [ "$FULL_INSTALL_REQUIRED" = "true" ]; then
 else
     echo "Golden image; skipping dependencies installation"
 fi
-
 installContainerRuntime
 
 installNetworkPlugin
@@ -97,8 +96,8 @@ ensureContainerd
 ensureMonitorService
 
 ensureSysctl
-ensureKubelet
 ensureJournal
+ensureKubelet
 ensureNoDupOnPromiscuBridge
 
 if $FULL_INSTALL_REQUIRED; then
